@@ -12,12 +12,12 @@ COPY go.sum .
 RUN go mod download
 
 COPY . .
-RUN go build -o speedTest
+RUN go build -o simple-download-tool
 
 FROM scratch
 WORKDIR /app
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /build/speedTest .
+COPY --from=builder /build/simple-download-tool .
 
-
-CMD ["/app/speedTest"]
+ENTRYPOINT ["/app/simple-download-tool"]
+CMD ["-h"]
