@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/crazygit/simple-download-tool/util"
 	"github.com/schollz/progressbar/v3"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -9,13 +10,13 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"speedtest/util"
 	"strings"
 )
 
 var (
-	url, output      string
-	urlPromptContent = util.NewPromptContent(
+	url, output       string
+	quitAfterDownload bool
+	urlPromptContent  = util.NewPromptContent(
 		"The url to download?",
 		"Please provide a valid url. for example: <http://212.183.159.230/5MB.zip>",
 		util.OptionSetValidator(util.UrlValidator),
@@ -26,8 +27,8 @@ var (
 		"Please provide a valid path. for example: /path/to/download/filename.ext",
 		util.OptionSetDefault("5MB.zip"),
 	)
-	continuePromptContent = util.NewPromptContent(
-		"Continue Test?",
+	quitePromptContent = util.NewPromptContent(
+		"Quite?",
 		"Please choose Y/N",
 		util.OptionSetValidator(util.YesNoValidator),
 	)
@@ -35,20 +36,8 @@ var (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "speedTest",
-	Short: "Download something from a given url to test download speed",
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	//Args: func(cmd *cobra.Command, args []string) error {
-	//	if len(args) < 1 {
-	//		return errors.New("requires a url argument")
-	//	}
-	//	if err := IsValidUrl(args[0]); err != nil {
-	//		return fmt.Errorf("invalid url specified: %s", args[0])
-	//	} else {
-	//		return nil
-	//	}
-	//},
+	Use:   "simple-download-tool",
+	Short: "Download something from a given url",
 	Run: func(cmd *cobra.Command, args []string) {
 	START:
 		if url == "" {
@@ -64,13 +53,15 @@ var rootCmd = &cobra.Command{
 		if err := downloadFile(url, output); err != nil {
 			util.Log.Error(err)
 		}
-		continueTest := util.PromptGetInput(continuePromptContent)
-		if strings.ToLower(continueTest) == "n" {
-			os.Exit(0)
-		} else {
-			url = ""
-			output = ""
-			goto START
+		if !quitAfterDownload {
+			quite := util.PromptGetInput(quitePromptContent)
+			if strings.ToLower(quite) == "y" {
+				os.Exit(0)
+			} else {
+				url = ""
+				output = ""
+				goto START
+			}
 		}
 	},
 	Version: "0.01",
@@ -95,9 +86,10 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	cobra.MousetrapHelpText = "" // windows 下禁止提示This is a command line tool.
+	cobra.MousetrapHelpText = "" // Disable prompt "This is a command line tool" on Windows system
 	rootCmd.Flags().StringVarP(&url, "url", "u", "", urlPromptContent.Label)
 	rootCmd.Flags().StringVarP(&output, "output", "o", "", outputPromptContent.Label)
+	rootCmd.Flags().BoolVarP(&quitAfterDownload, "quite", "q", false, outputPromptContent.Label)
 }
 
 func downloadFile(url, output string) (err error) {

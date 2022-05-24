@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/crazygit/simple-download-tool/cmd"
+	"github.com/crazygit/simple-download-tool/util"
 	"os"
-	"speedtest/cmd"
-	"speedtest/util"
 )
 
 func main() {

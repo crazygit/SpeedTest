@@ -75,8 +75,8 @@ func NewPromptContent(label string, errorMsg string, options ...PromptContentOpt
 
 func PromptGetInput(pc *PromptContent) string {
 	prompt := promptui.Prompt{
-		Label: pc.Label,
-		//Templates: pc.Templates,
+		Label:     pc.Label,
+		Templates: pc.Templates,
 		Validate:  pc.Validate,
 		Default:   pc.Default,
 		IsConfirm: pc.IsConfirm,

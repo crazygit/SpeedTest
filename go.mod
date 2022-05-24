@@ -1,4 +1,4 @@
-module speedtest
+module github.com/crazygit/simple-download-tool
 
 go 1.18
 

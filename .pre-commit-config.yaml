@@ -12,17 +12,13 @@ repos:
     hooks:
       - id: go-fmt
         args: [ -w ]
-      #- id: my-cmd-mod
-      #  name: swag-fmt
-      #  alias: swag-fmt
-      #  args: [ swag, fmt ]
       - id: go-mod-tidy
       - id: golangci-lint-mod
       #- id: go-sec-mod
       - id: go-vet-mod
-#      - id: go-test-mod
+  #      - id: go-test-mod
   - repo: https://github.com/hadolint/hadolint
     rev: v2.10.0
     hooks:
       - id: hadolint
-        args: [--ignore, DL3018]
+        args: [ --ignore, DL3018 ]
