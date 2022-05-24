@@ -14,6 +14,7 @@ type PromptContent struct {
 	Templates *promptui.PromptTemplates
 	Default   string
 	IsConfirm bool
+	AllowEdit bool
 }
 
 type PromptContentOption func(pc *PromptContent)
@@ -54,6 +55,7 @@ func OptionSetDefault(defaultValue string) PromptContentOption {
 		pc.Default = defaultValue
 	}
 }
+
 func OptionSetIsConfirm(isConfirm bool) PromptContentOption {
 	return func(pc *PromptContent) {
 		pc.IsConfirm = isConfirm
@@ -70,6 +72,11 @@ func NewPromptContent(label string, errorMsg string, options ...PromptContentOpt
 	for _, option := range options {
 		option(pc)
 	}
+	// Put cursor at the end of the line when providing default value
+	// https://github.com/manifoldco/promptui/issues/146
+	if pc.Default != "" {
+		pc.AllowEdit = true
+	}
 	return pc
 }
 
@@ -80,6 +87,7 @@ func PromptGetInput(pc *PromptContent) string {
 		Validate:  pc.Validate,
 		Default:   pc.Default,
 		IsConfirm: pc.IsConfirm,
+		AllowEdit: pc.AllowEdit,
 	}
 
 	result, err := prompt.Run()
