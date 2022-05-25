@@ -27,8 +27,8 @@ var (
 		"Please provide a valid path. for example: /path/to/download/filename.ext",
 		util.OptionSetDefault("5MB.zip"),
 	)
-	quitePromptContent = util.NewPromptContent(
-		"Quite?",
+	quitPromptContent = util.NewPromptContent(
+		"Quit?",
 		"Please choose Y/N",
 		util.OptionSetValidator(util.YesNoValidator),
 	)
@@ -39,30 +39,7 @@ var rootCmd = &cobra.Command{
 	Use:   "simple-download-tool",
 	Short: "Download something from a given url",
 	Run: func(cmd *cobra.Command, args []string) {
-	START:
-		if url == "" {
-			url = util.PromptGetInput(urlPromptContent)
-		}
-		if output == "" {
-			output = util.PromptGetInput(outputPromptContent)
-		}
-		util.Log.WithFields(logrus.Fields{
-			"url":    url,
-			"output": output,
-		}).Info("Download Info")
-		if err := downloadFile(url, output); err != nil {
-			util.Log.Error(err)
-		}
-		if !quitAfterDownload {
-			quite := util.PromptGetInput(quitePromptContent)
-			if strings.ToLower(quite) == "y" {
-				os.Exit(0)
-			} else {
-				url = ""
-				output = ""
-				goto START
-			}
-		}
+		runCmd()
 	},
 	Version: "0.01",
 }
@@ -89,7 +66,7 @@ func init() {
 	cobra.MousetrapHelpText = "" // Disable prompt "This is a command line tool" on Windows system
 	rootCmd.Flags().StringVarP(&url, "url", "u", "", urlPromptContent.Label)
 	rootCmd.Flags().StringVarP(&output, "output", "o", "", outputPromptContent.Label)
-	rootCmd.Flags().BoolVarP(&quitAfterDownload, "quite", "q", false, outputPromptContent.Label)
+	rootCmd.Flags().BoolVarP(&quitAfterDownload, "quit", "q", false, outputPromptContent.Label)
 }
 
 func downloadFile(url, output string) (err error) {
@@ -135,4 +112,31 @@ func downloadFile(url, output string) (err error) {
 	}
 	util.Log.WithField("costTimeInSeconds", bar.State().SecondsSince).Info("Download Success")
 	return nil
+}
+
+func runCmd() {
+START:
+	if url == "" {
+		url = util.PromptGetInput(urlPromptContent)
+	}
+	if output == "" {
+		output = util.PromptGetInput(outputPromptContent)
+	}
+	util.Log.WithFields(logrus.Fields{
+		"url":    url,
+		"output": output,
+	}).Info("Download Info")
+	if err := downloadFile(url, output); err != nil {
+		util.Log.Error(err)
+	}
+	if !quitAfterDownload {
+		quit := util.PromptGetInput(quitPromptContent)
+		if strings.ToLower(quit) == "y" {
+			os.Exit(0)
+		} else {
+			url = ""
+			output = ""
+			goto START
+		}
+	}
 }

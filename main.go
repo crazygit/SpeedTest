@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
-	util.Log.WithField("args", os.Args[1:]).Info("App Started")
+	util.Log.WithField("args", os.Args).Info("App Started")
 	cmd.Execute()
 }
